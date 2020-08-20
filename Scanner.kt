@@ -1,35 +1,45 @@
 //INCLUDE ScanResult.kt
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import java.io.IOException
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.time.LocalDateTime
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
 
 fun ping(device: String): Boolean {
     val address = InetAddress.getByName(device)
-    return address.isReachable(2000)
+    return try {
+        address.isReachable(2000)
+    } catch (e: IOException) {
+        println("Failed: $e")
+        false
+    }
 }
 
-fun pingNetwork(broadcastAddress: String): List<ScanResult> {
+suspend fun ping(addresses: List<String>): List<ScanResult> = coroutineScope {
+    val res = addresses.map { ipAddress ->
+        println("Pinging device $ipAddress...")
+        val deferred = async(Dispatchers.IO) {
+            ScanResult(ipAddress = ipAddress, up = ping(ipAddress), scannedAt = LocalDateTime.now())
+        }
+        println("Done pinging device.")
+        deferred
+    }
+
+    res.map { it.await() }
+}
+
+suspend fun pingNetwork(broadcastAddress: String): List<ScanResult> {
     val endIpAddress = broadcastAddress.substring(broadcastAddress.length - 3, broadcastAddress.length)
     val ipStartRange = broadcastAddress.substring(0, broadcastAddress.length - 3)
 
     println("Pinging network with broadcast: $broadcastAddress")
 
-    val service = Executors.newCachedThreadPool()
+    val addresses = IntRange(start = 1, endInclusive = endIpAddress.toInt()).map { "$ipStartRange$it" }
 
-    val results = IntRange(start = 1, endInclusive = endIpAddress.toInt())
-            .map { device ->
-                val ipAddress = "$ipStartRange$device"
-                Callable { ScanResult(ipAddress = ipAddress, up = ping(ipAddress), scannedAt = LocalDateTime.now()) }
-            }
-            .map { service.submit(it) }
-            .map { it.get() }
-
-    service.shutdown()
-
-    return results
+    return ping(addresses)
 }
 
 fun findBroadcastAddresses() = NetworkInterface.getNetworkInterfaces().toList()
@@ -40,11 +50,10 @@ fun findBroadcastAddresses() = NetworkInterface.getNetworkInterfaces().toList()
         .map { it.hostAddress }
         .toList()
 
-fun scan(): List<ScanResult> {
+suspend fun scan(): List<ScanResult> {
     val broadcastAddressesToScan = findBroadcastAddresses()
 
     println("broadcastAddressesToScan: $broadcastAddressesToScan")
 
-    return broadcastAddressesToScan.flatMap { pingNetwork(it) }
-            .filter { it.up }
+    return broadcastAddressesToScan.flatMap { pingNetwork(it) }.filter { it.up }
 }
