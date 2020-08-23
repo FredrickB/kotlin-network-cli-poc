@@ -8,23 +8,23 @@ import java.net.InetAddress
 import java.net.NetworkInterface
 import java.time.LocalDateTime
 
-fun ping(device: String): Boolean {
-    val address = InetAddress.getByName(device)
+fun ping(ipAddress: String): Boolean {
+    val address = InetAddress.getByName(ipAddress)
     return try {
         address.isReachable(2000)
     } catch (e: IOException) {
-        println("Failed: $e")
+        println("Could not reach IP address: $ipAddress. Reason: $e")
         false
     }
 }
 
 suspend fun ping(addresses: List<String>): List<ScanResult> = coroutineScope {
     val res = addresses.map { ipAddress ->
-        println("Pinging device $ipAddress...")
+        println("Pinging IP address: $ipAddress...")
         val deferred = async(Dispatchers.IO) {
             ScanResult(ipAddress = ipAddress, up = ping(ipAddress), scannedAt = LocalDateTime.now())
         }
-        println("Done pinging device.")
+        println("Done")
         deferred
     }
 
@@ -35,7 +35,7 @@ suspend fun pingNetwork(broadcastAddress: String): List<ScanResult> {
     val endIpAddress = broadcastAddress.substring(broadcastAddress.length - 3, broadcastAddress.length)
     val ipStartRange = broadcastAddress.substring(0, broadcastAddress.length - 3)
 
-    println("Pinging network with broadcast: $broadcastAddress")
+    println("Pinging network with broadcast address: $broadcastAddress")
 
     val addresses = IntRange(start = 1, endInclusive = endIpAddress.toInt()).map { "$ipStartRange$it" }
 
@@ -53,7 +53,7 @@ fun findBroadcastAddresses() = NetworkInterface.getNetworkInterfaces().toList()
 suspend fun scan(): List<ScanResult> {
     val broadcastAddressesToScan = findBroadcastAddresses()
 
-    println("broadcastAddressesToScan: $broadcastAddressesToScan")
+    println("Addresses to ping: $broadcastAddressesToScan")
 
     return broadcastAddressesToScan.flatMap { pingNetwork(it) }.filter { it.up }
 }
