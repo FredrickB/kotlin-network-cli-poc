@@ -1,6 +1,6 @@
 # Kscript network cli
 This is a simple project for testing [kscript](https://github.com/holgerbrandl/kscript) and coroutines. 
-The cli simply finds all network interfaces on host and attempts to ping each host on subnet with range /24. 
+The cli simply finds all network interfaces on the host and attempts to ping each host on subnet with range /24. 
 Each ping is launched as new coroutine asynchronously.
 
 ## Development
