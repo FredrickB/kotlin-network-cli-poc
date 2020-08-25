@@ -4,4 +4,4 @@ This is a simple project for testing [kscript](https://github.com/holgerbrandl/k
 ## Setting up annotation support in IDEA
 Including screenshot since I had some troubles with this initially.
 
-See ![idea project setup](https://github.com/FredrickB/kscript-network-cli/blob/master/screenshots/idea_project_structure_annotation_setup.png)
+See ![idea project setup](/screenshots/idea_project_structure_annotation_setup.png)
