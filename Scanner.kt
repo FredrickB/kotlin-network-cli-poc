@@ -1,4 +1,4 @@
-//INCLUDE ScanResult.kt
+@file:Include("ScanResult.kt")
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
