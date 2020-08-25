@@ -37,7 +37,7 @@ suspend fun pingNetwork(broadcastAddress: String): List<ScanResult> {
 
     println("Pinging network with broadcast address: $broadcastAddress")
 
-    val addresses = IntRange(start = 1, endInclusive = endIpAddress.toInt()).map { "$ipStartRange$it" }
+    val addresses = IntRange(start = 1, endInclusive = endIpAddress.toInt() - 1).map { "$ipStartRange$it" }
 
     return ping(addresses)
 }
@@ -53,7 +53,7 @@ fun findBroadcastAddresses() = NetworkInterface.getNetworkInterfaces().toList()
 suspend fun scan(): List<ScanResult> {
     val broadcastAddressesToScan = findBroadcastAddresses()
 
-    println("Addresses to ping: $broadcastAddressesToScan")
+    println("Ranges to scan: $broadcastAddressesToScan")
 
     return broadcastAddressesToScan.flatMap { pingNetwork(it) }.filter { it.up }
 }
