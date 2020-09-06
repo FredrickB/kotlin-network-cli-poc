@@ -1,9 +1,9 @@
-# kotlin network cli
+# kotlin network cli proof of concept
 This is a simple proof of concept for testing [kscript](https://github.com/holgerbrandl/kscript) and coroutines. 
 
 Simply finds all network interfaces on the host and attempts to ping each host on subnet with range /24. 
-Each ping is launched as new coroutine asynchronously. Uses the `InetAddress.getByName(...)`, so any result is a best
-effort and not reliable for any serious use case.
+
+_The networking portion of the code is a best-case effort due to the underlying implementation of the networking libraries. It works ok enough for prrof of concept, but don't use it for anything serious._
 
 ## Development
 ### Setup environment
