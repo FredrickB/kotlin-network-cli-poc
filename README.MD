@@ -3,7 +3,7 @@ This is a simple proof of concept for testing [kscript](https://github.com/holge
 
 Simply finds all network interfaces on the host and attempts to ping each host on subnet with range /24. 
 
-_The networking portion of the code is a best-case effort due to the underlying implementation of the networking libraries. It works ok enough for prrof of concept, but don't use it for anything serious._
+_The networking portion of the code is a best-case effort due to the underlying implementation of the networking libraries. It works ok enough for a proof of concept, but don't use it for anything serious._
 
 ## Development
 ### Setup environment
